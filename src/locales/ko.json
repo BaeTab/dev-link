@@ -1,0 +1,114 @@
+{
+    "common": {
+        "login_github": "GitHub로 시작하기",
+        "logout": "로그아웃",
+        "loading": "로딩 중...",
+        "save": "저장",
+        "saving": "저장 중...",
+        "delete": "삭제",
+        "confirm_delete": "정말 삭제하시겠습니까?",
+        "add": "추가",
+        "view_page": "내 페이지 보기",
+        "footer": "Built with Dev-Link"
+    },
+    "landing": {
+        "hero_title": "개발자의 여정을 보여주세요",
+        "hero_desc": "프로젝트, 기술 스택, 소셜 링크를 보여주는 프리미엄 글래스모피즘 프로필을 만들어보세요.",
+        "get_started": "GitHub로 시작하기",
+        "features_title": "왜 Dev-Link인가요?",
+        "feature_1_title": "개발자 중심",
+        "feature_1_desc": "기술 스택과 GitHub 저장소를 강조하기 위해 개발자를 위해 만들어졌습니다.",
+        "feature_2_title": "글래스모피즘 디자인",
+        "feature_2_desc": "즉시 눈에 띄는 현대적이고 미적인 유리 같은 UI를 제공합니다.",
+        "feature_3_title": "기술 스택 배지",
+        "feature_3_desc": "Shields.io 배지를 자동으로 생성하여 기술 스택을 자랑하세요.",
+        "how_it_works": "사용 방법",
+        "step_1": "GitHub로 로그인",
+        "step_2": "프로필 꾸미기",
+        "step_3": "링크 공유하기",
+        "faq_title": "자주 묻는 질문",
+        "faq_1_q": "Dev-Link는 무료인가요?",
+        "faq_1_a": "네, Dev-Link는 모든 개발자에게 완전히 무료로 제공됩니다.",
+        "faq_2_q": "새로운 기능을 요청할 수 있나요?",
+        "faq_2_a": "물론입니다! 우리는 오픈 소스이며 피드백을 환영합니다."
+    },
+    "footer": {
+        "privacy": "개인정보처리방침",
+        "terms": "이용약관",
+        "guide": "사용자 가이드"
+    },
+    "guide": {
+        "title": "시작 가이드",
+        "intro": "Dev-Link에 오신 것을 환영합니다! 이 가이드는 프로필 설정을 도와줍니다.",
+        "step_1_title": "1. 계정 생성",
+        "step_1_desc": "'시작하기' 버튼을 클릭하고 GitHub 계정으로 로그인하세요.",
+        "step_2_title": "2. 프로필 편집",
+        "step_2_desc": "자기소개를 입력하고 테마를 선택하며 기술 스택을 고르세요.",
+        "step_3_title": "3. 링크 추가",
+        "step_3_desc": "프로젝트 링크를 추가하세요. 설명과 스택 배지를 추가하는 것을 잊지 마세요!"
+    },
+    "legal": {
+        "privacy_title": "개인정보처리방침",
+        "terms_title": "이용약관",
+        "last_updated": "최종 수정일: 2025년 12월 19일"
+    },
+    "home": {
+        "subtitle": "개발자의 여정을 담은 프리미엄 글래스모피즘 링크 페이지"
+    },
+    "dashboard": {
+        "title": "대시보드",
+        "welcome": "{{name}}님 환영합니다",
+        "tab_links": "링크 관리",
+        "tab_profile": "프로필 & 테마"
+    },
+    "profile": {
+        "title": "프로필 설정",
+        "desc": "공개 프로필 정보를 관리하세요.",
+        "username": "사용자명",
+        "bio": "자기소개",
+        "project_intro": "프로젝트 소개",
+        "theme": "테마",
+        "theme_dark": "다크 (기본)",
+        "theme_light": "라이트",
+        "placeholder_bio": "자기소개를 입력하세요",
+        "placeholder_project_intro": "주요 프로젝트나 기술 스택을 간단히 소개하세요.",
+        "tech_stack": "기술 스택",
+        "select_stack": "기술 스택을 선택하세요",
+        "placeholder_custom_stack": "직접 입력...",
+        "add_custom": "추가",
+        "selected_stacks": "선택된 스택",
+        "msg_username_taken": "이미 사용 중인 사용자명입니다.",
+        "msg_update_success": "프로필이 업데이트되었습니다!",
+        "msg_update_fail": "프로필 업데이트 실패."
+    },
+    "links": {
+        "title": "새 링크 추가",
+        "desc": "프로젝트, 소셜 미디어, 블로그 등을 공유하세요.",
+        "label_title": "제목",
+        "label_url": "URL",
+        "label_description": "설명 (선택사항)",
+        "label_stack": "기술 스택 (선택사항)",
+        "placeholder_title": "멋진 프로젝트",
+        "placeholder_url": "https://github.com/...",
+        "placeholder_description": "이 링크에 대해 간단히 설명해주세요.",
+        "empty": "아직 링크가 없습니다. 위에서 추가해보세요!"
+    },
+    "user_page": {
+        "not_found_title": "404",
+        "not_found_desc": "사용자를 찾을 수 없습니다",
+        "create_own": "나만의 Dev-Link 만들기",
+        "no_bio": "아직 자기소개가 없습니다.",
+        "no_links": "아직 추가된 링크가 없습니다."
+    },
+    "github": {
+        "import_button": "GitHub에서 가져오기",
+        "select_repos": "레포지토리 선택",
+        "add_selected": "선택한 레포 추가",
+        "loading": "레포지토리 불러오는 중...",
+        "no_repos": "공개 레포지토리가 없습니다",
+        "stars": "스타",
+        "cancel": "취소",
+        "error": "레포지토리를 불러오는데 실패했습니다",
+        "relogin": "다시 로그인해주세요"
+    }
+}

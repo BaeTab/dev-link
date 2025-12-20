@@ -1,0 +1,114 @@
+{
+    "common": {
+        "login_github": "Get Started with GitHub",
+        "logout": "Logout",
+        "loading": "Loading...",
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "delete": "Delete",
+        "confirm_delete": "Are you sure you want to delete this link?",
+        "add": "Add",
+        "view_page": "View Page",
+        "footer": "Built with Dev-Link"
+    },
+    "landing": {
+        "hero_title": "Showcase your developer journey",
+        "hero_desc": "Create a premium, glassmorphism-styled profile to display your projects, skills, and social links.",
+        "get_started": "Get Started with GitHub",
+        "features_title": "Why Dev-Link?",
+        "feature_1_title": "Developer Focused",
+        "feature_1_desc": "Built specifically for developers to highlight tech stacks and GitHub repositories.",
+        "feature_2_title": "Glassmorphism Design",
+        "feature_2_desc": "Modern, aesthetic glass-like UI that stands out immediately.",
+        "feature_3_title": "Tech Stack Badges",
+        "feature_3_desc": "Display your skills with automatically generated shields.io badges.",
+        "how_it_works": "How it Works",
+        "step_1": "Sign in with GitHub",
+        "step_2": "Customize your profile",
+        "step_3": "Share your link",
+        "faq_title": "Frequently Asked Questions",
+        "faq_1_q": "Is Dev-Link free?",
+        "faq_1_a": "Yes, Dev-Link is completely free to use for all developers.",
+        "faq_2_q": "Can I request new features?",
+        "faq_2_a": "Absolutely! We are open source and welcome feedback."
+    },
+    "footer": {
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "guide": "User Guide"
+    },
+    "guide": {
+        "title": "Getting Started Guide",
+        "intro": "Welcome to Dev-Link! This guide will help you set up your profile.",
+        "step_1_title": "1. create account",
+        "step_1_desc": "Click the 'Get Started' button and log in with your GitHub account.",
+        "step_2_title": "2. Edit Profile",
+        "step_2_desc": "Add your bio, choose a theme, and select your tech stacks.",
+        "step_3_title": "3. Add Links",
+        "step_3_desc": "Add links to your projects. Don't forget to add descriptions and stack badges!"
+    },
+    "legal": {
+        "privacy_title": "Privacy Policy",
+        "terms_title": "Terms of Service",
+        "last_updated": "Last updated: December 19, 2025"
+    },
+    "home": {
+        "subtitle": "Showcase your developer journey with a premium, glassmorphism-styled link page."
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome back, {{name}}",
+        "tab_links": "Links",
+        "tab_profile": "Profile & Appearance"
+    },
+    "profile": {
+        "title": "Profile Settings",
+        "desc": "Manage your public profile information.",
+        "username": "Username",
+        "bio": "Bio",
+        "project_intro": "Project Introduction",
+        "theme": "Theme",
+        "theme_dark": "Dark (Default)",
+        "theme_light": "Light",
+        "placeholder_bio": "Tell us about yourself",
+        "placeholder_project_intro": "Briefly describe your main project or skills.",
+        "tech_stack": "Tech Stack",
+        "select_stack": "Select your tech stack",
+        "placeholder_custom_stack": "Type custom stack...",
+        "add_custom": "Add",
+        "selected_stacks": "Selected Stacks",
+        "msg_username_taken": "Username is already taken.",
+        "msg_update_success": "Profile updated successfully!",
+        "msg_update_fail": "Failed to update profile."
+    },
+    "links": {
+        "title": "Add New Link",
+        "desc": "Share your projects, social profiles, or blog posts.",
+        "label_title": "Title",
+        "label_url": "URL",
+        "label_description": "Description (Optional)",
+        "label_stack": "Tech Stack (Optional)",
+        "placeholder_title": "My Awesome Project",
+        "placeholder_url": "https://github.com/...",
+        "placeholder_description": "Briefly explain what this link is about.",
+        "empty": "No links yet. Add one above!"
+    },
+    "user_page": {
+        "not_found_title": "404",
+        "not_found_desc": "User not found",
+        "create_own": "Create your own Dev-Link",
+        "no_bio": "No bio yet.",
+        "no_links": "No links added yet."
+    },
+    "github": {
+        "import_button": "Import from GitHub",
+        "select_repos": "Select Repositories",
+        "add_selected": "Add Selected Repos",
+        "loading": "Loading repositories...",
+        "no_repos": "No public repositories found",
+        "stars": "stars",
+        "cancel": "Cancel",
+        "error": "Failed to load repositories",
+        "relogin": "Please log in again"
+    }
+}
