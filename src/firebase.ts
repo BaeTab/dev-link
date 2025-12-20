@@ -18,7 +18,8 @@ import {
     getDocs,
     onSnapshot,
     orderBy,
-    serverTimestamp
+    serverTimestamp,
+    writeBatch
 } from "firebase/firestore";
 
 import { getAnalytics } from "firebase/analytics";
@@ -131,4 +132,13 @@ export const updateLink = async (uid: string, linkId: string, linkData: any) => 
 export const deleteLink = async (uid: string, linkId: string) => {
     const docRef = doc(db, "users", uid, "links", linkId);
     await deleteDoc(docRef);
+};
+
+export const updateLinksOrder = async (uid: string, orderedLinks: { id: string, order: number }[]) => {
+    const batch = writeBatch(db);
+    orderedLinks.forEach(({ id, order }) => {
+        const docRef = doc(db, "users", uid, "links", id);
+        batch.set(docRef, { order }, { merge: true });
+    });
+    await batch.commit();
 };

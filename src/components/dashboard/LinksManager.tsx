@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import type { User } from 'firebase/auth';
 import { useTranslation } from 'react-i18next';
-import { subscribeToLinks, addLink, deleteLink, updateLink } from '@/firebase';
+import { subscribeToLinks, addLink, deleteLink, updateLink, updateLinksOrder } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { GripVertical, Trash2, Plus, Pencil, X, Check, ChevronUp, Link as LinkIcon, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
 
 import { StackSelector } from '@/components/ui/stack-selector';
 import GitHubRepoSelector from '@/components/dashboard/GitHubRepoSelector';
@@ -84,17 +84,14 @@ export default function LinksManager({ user }: LinksManagerProps) {
         }
     };
 
-    // Handle bulk adding links from GitHub repos
     const handleBulkAddLinks = async (linksToAdd: { title: string; url: string; description: string; stacks: string[]; order: number }[]) => {
         for (const linkData of linksToAdd) {
             await addLink(user.uid, linkData);
         }
     };
 
-    // Start editing a link
     const startEditing = (link: Link) => {
         if (editingId === link.id) {
-            // Toggle off if already editing
             setEditingId(null);
             return;
         }
@@ -105,12 +102,10 @@ export default function LinksManager({ user }: LinksManagerProps) {
         setEditStacks(link.stacks || []);
     };
 
-    // Cancel editing
     const cancelEditing = () => {
         setEditingId(null);
     };
 
-    // Save edited link
     const saveEdit = async () => {
         if (!editingId || !editTitle || !editUrl) return;
 
@@ -127,6 +122,25 @@ export default function LinksManager({ user }: LinksManagerProps) {
             console.error("Error updating link:", error);
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handleReorder = async (newOrder: Link[]) => {
+        // Optimistically update local state
+        setLinks(newOrder);
+
+        // Prepare batch update data
+        const updates = newOrder.map((link, index) => ({
+            id: link.id,
+            order: index
+        }));
+
+        try {
+            await updateLinksOrder(user.uid, updates);
+        } catch (error) {
+            console.error("Error updating order:", error);
+            // In case of error, the subscribeToLinks will eventually reset state 
+            // but we might want to show a toast or message
         }
     };
 
@@ -252,160 +266,231 @@ export default function LinksManager({ user }: LinksManagerProps) {
                     </h3>
                 </div>
 
-                <AnimatePresence mode="popLayout">
-                    {links.map((link, index) => (
-                        <motion.div
-                            key={link.id}
-                            layout
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.3, delay: index * 0.05 }}
-                        >
-                            <div
-                                className={`
-                                    group glass-panel rounded-2xl transition-all duration-300 overflow-hidden
-                                    ${editingId === link.id ? 'ring-2 ring-purple-500 shadow-xl shadow-purple-500/10' : 'hover:shadow-md hover:translate-y-[-2px]'}
-                                `}
-                            >
-                                <div
-                                    className="flex items-center gap-4 p-5 cursor-pointer"
-                                    onClick={() => startEditing(link)}
-                                >
-                                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-400 group-hover:text-purple-500 transition-colors">
-                                        <GripVertical className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-0.5">
-                                            <h4 className="font-bold truncate text-gray-900 dark:text-gray-100">{link.title}</h4>
-                                            {link.stacks && link.stacks.length > 0 && (
-                                                <div className="flex gap-1 overflow-hidden">
-                                                    {link.stacks.slice(0, 3).map(stack => (
-                                                        <span key={stack} className="w-1.5 h-1.5 rounded-full bg-purple-500/50" />
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <p className="text-xs text-muted-foreground truncate font-mono opacity-80">{link.url}</p>
-                                    </div>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8 text-gray-400 hover:text-purple-500"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                startEditing(link);
-                                            }}
-                                        >
-                                            {editingId === link.id ? <ChevronUp className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8 text-gray-400 hover:text-red-500"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDelete(link.id);
-                                            }}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </div>
+                <Reorder.Group axis="y" values={links} onReorder={handleReorder} className="space-y-4">
+                    <AnimatePresence mode="popLayout" initial={false}>
+                        {links.map((link) => (
+                            <ReorderItem
+                                key={link.id}
+                                link={link}
+                                editingId={editingId}
+                                startEditing={startEditing}
+                                handleDelete={handleDelete}
+                                cancelEditing={cancelEditing}
+                                saveEdit={saveEdit}
+                                editTitle={editTitle}
+                                setEditTitle={setEditTitle}
+                                editUrl={editUrl}
+                                setEditUrl={setEditUrl}
+                                editDesc={editDesc}
+                                setEditDesc={setEditDesc}
+                                editStacks={editStacks}
+                                setEditStacks={setEditStacks}
+                                isSaving={isSaving}
+                                t={t}
+                            />
+                        ))}
+                    </AnimatePresence>
+                </Reorder.Group>
 
-                                <AnimatePresence>
-                                    {editingId === link.id && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: 'auto', opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="overflow-hidden"
-                                        >
-                                            <div className="border-t border-gray-100 dark:border-gray-800 p-6 bg-gray-50/50 dark:bg-gray-900/50 space-y-5">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm font-semibold ml-1">{t('links.label_title')}</Label>
-                                                        <Input
-                                                            value={editTitle}
-                                                            onChange={(e) => setEditTitle(e.target.value)}
-                                                            placeholder={t('links.placeholder_title')}
-                                                            className="bg-white dark:bg-gray-950"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm font-semibold ml-1">{t('links.label_url')}</Label>
-                                                        <Input
-                                                            value={editUrl}
-                                                            onChange={(e) => setEditUrl(e.target.value)}
-                                                            placeholder={t('links.placeholder_url')}
-                                                            type="url"
-                                                            className="bg-white dark:bg-gray-950"
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <Label className="text-sm font-semibold ml-1">{t('links.label_description')}</Label>
-                                                    <Input
-                                                        value={editDesc}
-                                                        onChange={(e) => setEditDesc(e.target.value)}
-                                                        placeholder={t('links.placeholder_description')}
-                                                        className="bg-white dark:bg-gray-950"
-                                                    />
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <StackSelector
-                                                        selectedStacks={editStacks}
-                                                        onChange={setEditStacks}
-                                                        label={t('links.label_stack')}
-                                                    />
-                                                </div>
-
-                                                <div className="flex justify-end gap-3 pt-4">
-                                                    <Button variant="outline" size="sm" onClick={cancelEditing} className="h-10 rounded-xl px-4">
-                                                        <X className="w-4 h-4 mr-2" />
-                                                        {t('github.cancel')}
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        onClick={saveEdit}
-                                                        disabled={isSaving || !editTitle || !editUrl}
-                                                        className="h-10 rounded-xl px-6 bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/20"
-                                                    >
-                                                        {isSaving ? (
-                                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                                        ) : (
-                                                            <>
-                                                                <Check className="w-4 h-4 mr-2" />
-                                                                {t('common.save')}
-                                                            </>
-                                                        )}
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </motion.div>
-                    ))}
-                    {links.length === 0 && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="text-center py-20 bg-gray-50/50 dark:bg-gray-900/50 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800"
-                        >
-                            <div className="p-4 rounded-full bg-gray-100 dark:bg-gray-800 w-fit mx-auto mb-4">
-                                <LinkIcon className="w-6 h-6 text-gray-400" />
-                            </div>
-                            <p className="text-gray-500 font-medium">{t('links.empty')}</p>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                {links.length === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center py-20 bg-gray-50/50 dark:bg-gray-900/50 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800"
+                    >
+                        <div className="p-4 rounded-full bg-gray-100 dark:bg-gray-800 w-fit mx-auto mb-4">
+                            <LinkIcon className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="text-gray-500 font-medium">{t('links.empty')}</p>
+                    </motion.div>
+                )}
             </div>
         </div>
+    );
+}
+
+interface ReorderItemProps {
+    link: Link;
+    editingId: string | null;
+    startEditing: (link: Link) => void;
+    handleDelete: (id: string) => void;
+    cancelEditing: () => void;
+    saveEdit: () => void;
+    editTitle: string;
+    setEditTitle: (val: string) => void;
+    editUrl: string;
+    setEditUrl: (val: string) => void;
+    editDesc: string;
+    setEditDesc: (val: string) => void;
+    editStacks: string[];
+    setEditStacks: (val: string[]) => void;
+    isSaving: boolean;
+    t: any;
+}
+
+function ReorderItem({
+    link,
+    editingId,
+    startEditing,
+    handleDelete,
+    cancelEditing,
+    saveEdit,
+    editTitle,
+    setEditTitle,
+    editUrl,
+    setEditUrl,
+    editDesc,
+    setEditDesc,
+    editStacks,
+    setEditStacks,
+    isSaving,
+    t
+}: ReorderItemProps) {
+    const controls = useDragControls();
+
+    return (
+        <Reorder.Item
+            value={link}
+            dragControls={controls}
+            dragListener={false}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            whileDrag={{
+                scale: 1.02,
+                boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+                zIndex: 50
+            }}
+            transition={{ duration: 0.3 }}
+            className={`
+                group glass-panel rounded-2xl transition-all duration-300 overflow-hidden select-none
+                ${editingId === link.id ? 'ring-2 ring-purple-500 shadow-xl shadow-purple-500/10' : 'hover:shadow-md'}
+            `}
+        >
+            <div
+                className="flex items-center gap-4 p-5 cursor-default"
+                onClick={() => startEditing(link)}
+            >
+                <div
+                    className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-400 group-hover:text-purple-500 transition-colors cursor-grab active:cursor-grabbing touch-none"
+                    onPointerDown={(e) => controls.start(e)}
+                >
+                    <GripVertical className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                        <h4 className="font-bold truncate text-gray-900 dark:text-gray-100">{link.title}</h4>
+                        {link.stacks && link.stacks.length > 0 && (
+                            <div className="flex gap-1 overflow-hidden">
+                                {link.stacks.slice(0, 3).map(stack => (
+                                    <span key={stack} className="w-1.5 h-1.5 rounded-full bg-purple-500/50" />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate font-mono opacity-80">{link.url}</p>
+                </div>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-gray-400 hover:text-purple-500"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            startEditing(link);
+                        }}
+                    >
+                        {editingId === link.id ? <ChevronUp className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-gray-400 hover:text-red-500"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(link.id);
+                        }}
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </Button>
+                </div>
+            </div>
+
+            <AnimatePresence>
+                {editingId === link.id && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="border-t border-gray-100 dark:border-gray-800 p-6 bg-gray-50/50 dark:bg-gray-900/50 space-y-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-semibold ml-1">{t('links.label_title')}</Label>
+                                    <Input
+                                        value={editTitle}
+                                        onChange={(e) => setEditTitle(e.target.value)}
+                                        placeholder={t('links.placeholder_title')}
+                                        className="bg-white dark:bg-gray-950"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-semibold ml-1">{t('links.label_url')}</Label>
+                                    <Input
+                                        value={editUrl}
+                                        onChange={(e) => setEditUrl(e.target.value)}
+                                        placeholder={t('links.placeholder_url')}
+                                        type="url"
+                                        className="bg-white dark:bg-gray-950"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-sm font-semibold ml-1">{t('links.label_description')}</Label>
+                                <Input
+                                    value={editDesc}
+                                    onChange={(e) => setEditDesc(e.target.value)}
+                                    placeholder={t('links.placeholder_description')}
+                                    className="bg-white dark:bg-gray-950"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <StackSelector
+                                    selectedStacks={editStacks}
+                                    onChange={setEditStacks}
+                                    label={t('links.label_stack')}
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4">
+                                <Button variant="outline" size="sm" onClick={cancelEditing} className="h-10 rounded-xl px-4">
+                                    <X className="w-4 h-4 mr-2" />
+                                    {t('github.cancel')}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    onClick={saveEdit}
+                                    disabled={isSaving || !editTitle || !editUrl}
+                                    className="h-10 rounded-xl px-6 bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/20"
+                                >
+                                    {isSaving ? (
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        <>
+                                            <Check className="w-4 h-4 mr-2" />
+                                            {t('common.save')}
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </Reorder.Item>
     );
 }
