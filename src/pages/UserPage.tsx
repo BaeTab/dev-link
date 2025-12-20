@@ -128,6 +128,8 @@ export default function UserPage() {
             <SEO
                 title={`${profile?.displayName || profile?.username} | Dev-Link`}
                 description={profile?.bio || `Check out ${profile?.username}'s links on Dev-Link.`}
+                image={profile?.photoURL}
+                url={`/${profile?.username}`}
             />
             <LanguageToggle />
 
