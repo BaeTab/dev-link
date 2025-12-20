@@ -38,7 +38,7 @@ export default function Guide() {
                             <h2 className="text-2xl font-bold mb-3 text-blue-300">{t('guide.step_2_title')}</h2>
                             <p className="text-gray-300 leading-relaxed text-lg">{t('guide.step_2_desc')}</p>
                             <ul className="list-disc list-inside mt-2 text-gray-400 space-y-1 ml-2">
-                                <li>Set a unique username (dev-link.web.app/yourname)</li>
+                                <li>Set a unique username (devv-link.web.app/yourname)</li>
                                 <li>Write a short bio</li>
                                 <li>Select "Dark" or "Light" theme</li>
                                 <li>Add "My Tech Stack" to show off your skills</li>

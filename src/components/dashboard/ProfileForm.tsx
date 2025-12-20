@@ -115,9 +115,9 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                                 {t('profile.username')}
                             </Label>
                             <div className="flex items-center gap-0 group">
-                                <div className="h-11 px-4 flex items-center bg-gray-100 dark:bg-gray-800 border border-r-0 rounded-l-xl text-xs font-medium text-muted-foreground transition-colors group-focus-within:border-purple-500/50">
-                                    dev-link.web.app/
-                                </div>
+                                <span className="flex h-11 items-center rounded-l-xl border border-r-0 border-input bg-muted/50 px-4 text-sm font-medium text-muted-foreground whitespace-nowrap">
+                                    devv-link.web.app/
+                                </span>
                                 <Input
                                     id="username"
                                     value={username}
