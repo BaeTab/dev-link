@@ -4,12 +4,12 @@
 
 **개발자를 위한 프리미엄 링크 인 바이오 서비스**
 
-[![Deploy](https://img.shields.io/badge/Firebase-Deployed-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)](https://devlink.web.app)
+[![Deploy](https://img.shields.io/badge/Firebase-Deployed-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)](https://dev-link.web.app)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
 
-[🌐 Demo](https://devlink.web.app) · [🐛 Issues](https://github.com/your-username/dev-link/issues) · [💡 Feature Request](https://github.com/your-username/dev-link/issues)
+[🌐 Demo](https://dev-link.web.app) · [🐛 Issues](https://github.com/baetab/dev-link/issues) · [💡 Feature Request](https://github.com/baetab/dev-link/issues)
 
 </div>
 
