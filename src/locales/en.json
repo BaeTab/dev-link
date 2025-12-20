@@ -8,6 +8,8 @@
         "delete": "Delete",
         "confirm_delete": "Are you sure you want to delete this link?",
         "add": "Add",
+        "adding": "Adding...",
+        "or": "or",
         "view_page": "View Page",
         "footer": "Built with Dev-Link"
     },
@@ -91,6 +93,7 @@
         "placeholder_title": "My Awesome Project",
         "placeholder_url": "https://github.com/...",
         "placeholder_description": "Briefly explain what this link is about.",
+        "my_links": "My Links",
         "empty": "No links yet. Add one above!"
     },
     "user_page": {

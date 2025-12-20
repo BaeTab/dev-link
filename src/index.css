@@ -107,3 +107,24 @@
 .animate-blob {
   animation: blob 7s infinite;
 }
+
+.glass-panel {
+  @apply backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border border-white/20 dark:border-gray-800/30 shadow-[0_8px_32px_0_rgba(31_38_135_0.07)];
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.premium-gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400;
+}
+
+.glow-effect {
+  @apply relative;
+}
+
+.glow-effect::after {
+  content: '';
+  @apply absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200;
+}

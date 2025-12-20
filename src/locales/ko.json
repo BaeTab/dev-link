@@ -8,6 +8,8 @@
         "delete": "삭제",
         "confirm_delete": "정말 삭제하시겠습니까?",
         "add": "추가",
+        "adding": "추가 중...",
+        "or": "또는",
         "view_page": "내 페이지 보기",
         "footer": "Built with Dev-Link"
     },
@@ -91,6 +93,7 @@
         "placeholder_title": "멋진 프로젝트",
         "placeholder_url": "https://github.com/...",
         "placeholder_description": "이 링크에 대해 간단히 설명해주세요.",
+        "my_links": "내 링크",
         "empty": "아직 링크가 없습니다. 위에서 추가해보세요!"
     },
     "user_page": {
