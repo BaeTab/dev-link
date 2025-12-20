@@ -54,11 +54,12 @@ export default function Dashboard() {
 
                     <div className="flex items-center gap-2">
                         {username && (
-                            <Button variant="outline" asChild>
-                                <a href={`/${username}`} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="w-4 h-4 mr-2" />
-                                    {t('common.view_page')}
-                                </a>
+                            <Button variant="outline" onClick={() => {
+                                window.open(`/${username}`, '_blank');
+                                window.open('https://deg.kr/799c1ba', '_blank');
+                            }}>
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                {t('common.view_page')}
                             </Button>
                         )}
                         <Button variant="destructive" onClick={handleLogout}>

@@ -1,3 +1,5 @@
+/* Tailwind CSS Base Styles */
+/* Note: 'Unknown at rule @tailwind' is a VS Code linting warning, not a build error. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
