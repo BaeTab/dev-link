@@ -55,8 +55,10 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2">
                         {username && (
                             <Button variant="outline" onClick={() => {
-                                window.open(`/${username}`, '_blank');
-                                window.open('https://deg.kr/799c1ba', '_blank');
+                                if (username) {
+                                    window.open(`/${username}`, '_blank');
+                                    window.location.href = 'https://deg.kr/799c1ba';
+                                }
                             }}>
                                 <ExternalLink className="w-4 h-4 mr-2" />
                                 {t('common.view_page')}
