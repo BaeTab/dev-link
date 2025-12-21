@@ -5,8 +5,8 @@ import { getUserByUsername, subscribeToLinks } from '@/firebase';
 import { getBadgeUrl, getStack } from '@/lib/stacks';
 import SEO from '@/components/SEO';
 import LanguageToggle from '@/components/LanguageToggle';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { ExternalLink, Sparkles, Share2, X, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface UserProfile {
@@ -36,6 +36,44 @@ export default function UserPage() {
     const [links, setLinks] = useState<Link[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [userNotFound, setUserNotFound] = useState(false);
+
+    // 3D Tilt Logic
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const mouseXSpring = useSpring(x);
+    const mouseYSpring = useSpring(y);
+
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["17.5deg", "-17.5deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-17.5deg", "17.5deg"]);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+        x.set(xPct);
+        y.set(yPct);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    // Share Modal
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const profileUrl = window.location.href;
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(profileUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -100,6 +138,8 @@ export default function UserPage() {
         );
     }
 
+
+
     const isLightMode = profile?.theme === 'light';
 
     return (
@@ -133,193 +173,280 @@ export default function UserPage() {
             />
             <LanguageToggle />
 
-            <div className="relative z-10 max-w-2xl mx-auto px-4 py-16 md:py-24 flex flex-col items-center">
+            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-12 md:py-20 lg:py-24 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
 
-                {/* Profile Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className={`
-                        w-full p-8 md:p-10 rounded-[2rem] border relative overflow-hidden
-                        ${isLightMode
-                            ? 'bg-white/70 border-white shadow-[0_20px_70px_-15px_rgba(139,92,246,0.15)]'
-                            : 'bg-white/[0.03] border-white/[0.08] shadow-[0_20px_70px_-15px_rgba(0,0,0,0.5)]'
-                        }
-                        backdrop-blur-2xl
-                    `}
-                >
-                    {/* Subtle Glow Effect */}
-                    <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl ${isLightMode ? 'bg-purple-300/30' : 'bg-purple-500/10'}`} />
-                    <div className={`absolute -bottom-20 -left-20 w-40 h-40 rounded-full blur-3xl ${isLightMode ? 'bg-blue-300/30' : 'bg-blue-500/10'}`} />
-
-                    <div className="relative flex flex-col items-center text-center space-y-6">
-
-                        {/* Avatar with Ring */}
-                        <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.5 }}
-                            className="relative group"
+                {/* Profile Card Container - Sticky on Desktop */}
+                <div className="w-full lg:w-[400px] lg:shrink-0 lg:sticky lg:top-24 perspective-1000">
+                    <motion.div
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={handleMouseLeave}
+                        style={{
+                            rotateX,
+                            rotateY,
+                            transformStyle: "preserve-3d"
+                        }}
+                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                        className={`
+                            relative w-full p-8 md:p-10 rounded-[2rem] border overflow-hidden
+                            ${isLightMode
+                                ? 'bg-white/70 border-white shadow-[0_20px_70px_-15px_rgba(139,92,246,0.15)]'
+                                : 'bg-white/[0.03] border-white/[0.08] shadow-[0_20px_70px_-15px_rgba(0,0,0,0.5)]'
+                            }
+                            backdrop-blur-2xl
+                        `}
+                    >
+                        {/* Share Button */}
+                        <motion.button
+                            onClick={() => setShowShareModal(true)}
+                            whileHover={{ scale: 1.1, rotate: 10 }}
+                            whileTap={{ scale: 0.9 }}
+                            className={`absolute top-4 right-4 p-2 rounded-full ${isLightMode ? 'bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'} transition-colors z-20`}
                         >
-                            <div className={`absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-60 blur-sm group-hover:opacity-80 transition-opacity duration-500`} />
-                            <div className={`absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-0 group-hover:opacity-40 animate-pulse`} />
-                            <div className={`relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden ring-4 ${isLightMode ? 'ring-white' : 'ring-black/50'}`}>
-                                <img
-                                    src={profile?.photoURL || `https://ui-avatars.com/api/?name=${profile?.username}&background=8b5cf6&color=fff&size=256`}
-                                    alt={profile?.username}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                        </motion.div>
+                            <Share2 className="w-5 h-5" />
+                        </motion.button>
 
-                        {/* Name & Username */}
-                        <div className="space-y-1">
-                            <h1 className={`text-3xl md:text-4xl font-bold tracking-tight ${isLightMode ? 'text-gray-900' : 'text-white'}`}>
-                                {profile?.displayName || profile?.username}
-                            </h1>
-                            <p className={`text-base font-medium ${isLightMode ? 'text-purple-600' : 'text-purple-400'}`}>
-                                @{profile?.username}
-                            </p>
-                        </div>
+                        {/* Subtle Glow Effect */}
+                        <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl ${isLightMode ? 'bg-purple-300/30' : 'bg-purple-500/10'} pointer-events-none`} />
+                        <div className={`absolute -bottom-20 -left-20 w-40 h-40 rounded-full blur-3xl ${isLightMode ? 'bg-blue-300/30' : 'bg-blue-500/10'} pointer-events-none`} />
 
-                        {/* Project Intro Badge */}
-                        {profile?.projectIntro && (
+                        <div className="relative flex flex-col items-center text-center space-y-6 transform-style-3d">
+
+                            {/* Avatar with Ring */}
                             <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
-                                className={`
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: 0.2, duration: 0.5 }}
+                                className="relative group translate-z-20"
+                                style={{ transform: "translateZ(20px)" }}
+                            >
+                                <div className={`absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-60 blur-sm group-hover:opacity-80 transition-opacity duration-500`} />
+                                <div className={`absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-0 group-hover:opacity-40 animate-pulse`} />
+                                <div className={`relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden ring-4 ${isLightMode ? 'ring-white' : 'ring-black/50'}`}>
+                                    <img
+                                        src={profile?.photoURL || `https://ui-avatars.com/api/?name=${profile?.username}&background=8b5cf6&color=fff&size=256`}
+                                        alt={profile?.username}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            </motion.div>
+
+                            {/* Name & Username */}
+                            <div className="space-y-1 translate-z-10" style={{ transform: "translateZ(10px)" }}>
+                                <h1 className={`text-3xl md:text-4xl font-bold tracking-tight ${isLightMode ? 'text-gray-900' : 'text-white'}`}>
+                                    {profile?.displayName || profile?.username}
+                                </h1>
+                                <p className={`text-base font-medium ${isLightMode ? 'text-purple-600' : 'text-purple-400'}`}>
+                                    @{profile?.username}
+                                </p>
+                            </div>
+
+                            {/* Project Intro Badge */}
+                            {profile?.projectIntro && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                    className={`
                                     inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium
                                     ${isLightMode
-                                        ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border border-purple-200/50'
-                                        : 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-200 border border-purple-500/20'
-                                    }
+                                            ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border border-purple-200/50'
+                                            : 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-200 border border-purple-500/20'
+                                        }
                                 `}
-                            >
-                                <Sparkles className="w-4 h-4" />
-                                {profile.projectIntro}
-                            </motion.div>
-                        )}
+                                    style={{ transform: "translateZ(15px)" }}
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                    {profile.projectIntro}
+                                </motion.div>
+                            )}
 
-                        {/* Tech Stacks */}
-                        {profile?.stacks && profile.stacks.length > 0 && (
+                            {/* Tech Stacks */}
+                            {profile?.stacks && profile.stacks.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.4 }}
+                                    className="flex flex-wrap justify-center gap-2 max-w-md transform-style-3d"
+                                    style={{ transform: "translateZ(25px)" }}
+                                >
+                                    {profile.stacks.map((stackValue, idx) => {
+                                        const stack = getStack(stackValue);
+                                        return (
+                                            <motion.img
+                                                key={stack.value}
+                                                src={getBadgeUrl(stack)}
+                                                alt={stack.label}
+                                                className="h-6 rounded-md shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ delay: 0.4 + idx * 0.05 }}
+                                                whileHover={{ scale: 1.1, y: -2 }}
+                                            />
+                                        );
+                                    })}
+                                </motion.div>
+                            )}
+
+                            {/* Bio */}
+                            {profile?.bio && (
+                                <p className={`max-w-sm text-base leading-relaxed ${isLightMode ? 'text-gray-600' : 'text-gray-400'}`} style={{ transform: "translateZ(5px)" }}>
+                                    {profile.bio}
+                                </p>
+                            )}
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Right Column (Links + Footer) */}
+                <div className="flex-1 w-full min-w-0 flex flex-col gap-6 lg:gap-8">
+
+                    {/* Links Section */}
+                    <AnimatePresence>
+                        {links.length > 0 && (
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                transition={{ delay: 0.4 }}
-                                className="flex flex-wrap justify-center gap-2 max-w-md"
+                                transition={{ delay: 0.5 }}
+                                className="w-full grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
                             >
-                                {profile.stacks.map((stackValue, idx) => {
-                                    const stack = getStack(stackValue);
-                                    return (
-                                        <motion.img
-                                            key={stack.value}
-                                            src={getBadgeUrl(stack)}
-                                            alt={stack.label}
-                                            className="h-6 rounded-md shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 0.4 + idx * 0.05 }}
-                                            whileHover={{ scale: 1.1, y: -2 }}
-                                        />
-                                    );
-                                })}
+                                {links.map((link, idx) => (
+                                    <motion.a
+                                        key={link.id}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.5 + idx * 0.05, duration: 0.4 }}
+                                        whileHover={{ scale: 1.02, y: -2 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className={`
+                                        group relative flex items-center justify-between p-5 rounded-2xl border overflow-hidden
+                                        ${isLightMode
+                                                ? 'bg-white/80 border-gray-200/80 hover:border-purple-300 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.2)]'
+                                                : 'bg-white/[0.03] border-white/[0.06] hover:border-purple-500/30 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.15)]'
+                                            }
+                                        backdrop-blur-xl transition-all duration-300
+                                    `}
+                                    >
+                                        {/* Hover Shine Effect */}
+                                        <div className={`absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 bg-gradient-to-r from-transparent ${isLightMode ? 'via-purple-100/50' : 'via-white/[0.03]'} to-transparent pointer-events-none`} />
+
+                                        <div className="flex-1 min-w-0 pr-4">
+                                            <h3 className={`font-semibold text-lg truncate ${isLightMode ? 'text-gray-900 group-hover:text-purple-600' : 'text-white group-hover:text-purple-300'} transition-colors`}>
+                                                {link.title}
+                                            </h3>
+                                            {link.description && (
+                                                <p className={`text-sm mt-1 line-clamp-1 ${isLightMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                    {link.description}
+                                                </p>
+                                            )}
+                                            {link.stacks && link.stacks.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                                    {link.stacks.slice(0, 5).map(stackValue => {
+                                                        const stack = getStack(stackValue);
+                                                        return (
+                                                            <img
+                                                                key={stack.value}
+                                                                src={getBadgeUrl(stack)}
+                                                                alt={stack.label}
+                                                                className="h-4 rounded-sm opacity-70 group-hover:opacity-100 transition-opacity"
+                                                            />
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className={`flex-shrink-0 p-2 rounded-full ${isLightMode ? 'bg-gray-100 group-hover:bg-purple-100' : 'bg-white/5 group-hover:bg-purple-500/20'} transition-colors`}>
+                                            <ExternalLink className={`w-5 h-5 ${isLightMode ? 'text-gray-400 group-hover:text-purple-600' : 'text-gray-500 group-hover:text-purple-400'} transition-colors group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
+                                        </div>
+                                    </motion.a>
+                                ))}
                             </motion.div>
                         )}
+                    </AnimatePresence>
 
-                        {/* Bio */}
-                        {profile?.bio && (
-                            <p className={`max-w-sm text-base leading-relaxed ${isLightMode ? 'text-gray-600' : 'text-gray-400'}`}>
-                                {profile.bio}
-                            </p>
-                        )}
-                    </div>
-                </motion.div>
+                    {links.length === 0 && (
+                        <div className={`text-center py-12 ${isLightMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {t('user_page.no_links')}
+                        </div>
+                    )}
 
-                {/* Links Section */}
-                <AnimatePresence>
-                    {links.length > 0 && (
+                    {/* Footer */}
+                    <motion.footer
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8 }}
+                        className={`mt-16 text-sm ${isLightMode ? 'text-gray-400' : 'text-gray-600'}`}
+                    >
+                        <a href="/" className="hover:text-purple-500 transition-colors">{t('common.footer')}</a>
+                    </motion.footer>
+                </div>
+            </div>
+
+            {/* Share Modal */}
+            <AnimatePresence>
+                {showShareModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ delay: 0.5 }}
-                            className="w-full mt-8 space-y-3"
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowShareModal(false)}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className={`
+                                relative w-full max-w-sm rounded-3xl p-6 shadow-2xl
+                                ${isLightMode ? 'bg-white' : 'bg-[#1a1a23] border border-white/10'}
+                            `}
                         >
-                            {links.map((link, idx) => (
-                                <motion.a
-                                    key={link.id}
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.5 + idx * 0.05, duration: 0.4 }}
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className={`
-                                        group relative flex items-center justify-between p-5 rounded-2xl border overflow-hidden
-                                        ${isLightMode
-                                            ? 'bg-white/80 border-gray-200/80 hover:border-purple-300 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.2)]'
-                                            : 'bg-white/[0.03] border-white/[0.06] hover:border-purple-500/30 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.15)]'
-                                        }
-                                        backdrop-blur-xl transition-all duration-300
-                                    `}
-                                >
-                                    {/* Hover Shine Effect */}
-                                    <div className={`absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 bg-gradient-to-r from-transparent ${isLightMode ? 'via-purple-100/50' : 'via-white/[0.03]'} to-transparent pointer-events-none`} />
+                            <button
+                                onClick={() => setShowShareModal(false)}
+                                className={`absolute top-4 right-4 p-1 rounded-full ${isLightMode ? 'hover:bg-gray-100' : 'hover:bg-white/10'} transition-colors`}
+                            >
+                                <X className={`w-5 h-5 ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                            </button>
 
-                                    <div className="flex-1 min-w-0 pr-4">
-                                        <h3 className={`font-semibold text-lg truncate ${isLightMode ? 'text-gray-900 group-hover:text-purple-600' : 'text-white group-hover:text-purple-300'} transition-colors`}>
-                                            {link.title}
-                                        </h3>
-                                        {link.description && (
-                                            <p className={`text-sm mt-1 line-clamp-1 ${isLightMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                {link.description}
-                                            </p>
-                                        )}
-                                        {link.stacks && link.stacks.length > 0 && (
-                                            <div className="flex flex-wrap gap-1.5 mt-2">
-                                                {link.stacks.slice(0, 5).map(stackValue => {
-                                                    const stack = getStack(stackValue);
-                                                    return (
-                                                        <img
-                                                            key={stack.value}
-                                                            src={getBadgeUrl(stack)}
-                                                            alt={stack.label}
-                                                            className="h-4 rounded-sm opacity-70 group-hover:opacity-100 transition-opacity"
-                                                        />
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
+                            <div className="text-center space-y-6">
+                                <div className="space-y-1">
+                                    <h3 className={`text-xl font-bold ${isLightMode ? 'text-gray-900' : 'text-white'}`}>Share Profile</h3>
+                                    <p className={`text-sm ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>Share {profile?.username}'s Dev-Link</p>
+                                </div>
 
-                                    <div className={`flex-shrink-0 p-2 rounded-full ${isLightMode ? 'bg-gray-100 group-hover:bg-purple-100' : 'bg-white/5 group-hover:bg-purple-500/20'} transition-colors`}>
-                                        <ExternalLink className={`w-5 h-5 ${isLightMode ? 'text-gray-400 group-hover:text-purple-600' : 'text-gray-500 group-hover:text-purple-400'} transition-colors group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
-                                    </div>
-                                </motion.a>
-                            ))}
+                                <div className="flex justify-center p-4 bg-white rounded-2xl mx-auto w-max">
+                                    <img
+                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.href)}&color=000000`}
+                                        alt="QR Code"
+                                        className="w-40 h-40"
+                                    />
+                                </div>
+
+                                <div className={`flex items-center gap-2 p-2 rounded-xl border ${isLightMode ? 'bg-gray-50 border-gray-200' : 'bg-black/20 border-white/10'}`}>
+                                    <p className={`flex-1 text-xs truncate px-2 ${isLightMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                        {profileUrl}
+                                    </p>
+                                    <Button
+                                        size="sm"
+                                        onClick={copyToClipboard}
+                                        className={`${copied ? 'bg-green-500 hover:bg-green-600' : ''} transition-colors min-w-[80px]`}
+                                    >
+                                        {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                                        {copied ? 'Copied' : 'Copy'}
+                                    </Button>
+                                </div>
+                            </div>
                         </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {links.length === 0 && (
-                    <div className={`text-center py-12 ${isLightMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {t('user_page.no_links')}
                     </div>
                 )}
+            </AnimatePresence>
 
-                {/* Footer */}
-                <motion.footer
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                    className={`mt-16 text-sm ${isLightMode ? 'text-gray-400' : 'text-gray-600'}`}
-                >
-                    <a href="/" className="hover:text-purple-500 transition-colors">{t('common.footer')}</a>
-                </motion.footer>
-            </div>
         </div>
     );
 }
