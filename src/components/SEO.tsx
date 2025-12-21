@@ -32,6 +32,11 @@ export default function SEO({ title, description, image, url }: SEOProps) {
             <meta name="twitter:title" content={fullTitle} />
             <meta name="twitter:description" content={description || defaultDescription} />
             <meta name="twitter:image" content={ogImage} />
+
+            {/* Structured Data for International SEO */}
+            <link rel="alternate" hrefLang="en" href={siteUrl} />
+            <link rel="alternate" hrefLang="ko" href={`${siteUrl}?lang=ko`} />
+            <link rel="alternate" hrefLang="x-default" href={siteUrl} />
         </Helmet>
     );
 }
