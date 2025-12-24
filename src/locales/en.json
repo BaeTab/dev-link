@@ -14,12 +14,12 @@
         "footer": "Built with Dev-Link"
     },
     "landing": {
-        "hero_title": "Showcase your developer journey",
-        "hero_desc": "Create a premium, glassmorphism-styled profile to display your projects, skills, and social links.",
+        "hero_title": "The Ultimate Developer Link Tree & Portfolio",
+        "hero_desc": "Create a stunning glassmorphism profile to showcase your GitHub repositories, Tech Stack, and Developer Resume in minutes.",
         "get_started": "Get Started with GitHub",
         "features_title": "Why Dev-Link?",
-        "feature_1_title": "Developer Focused",
-        "feature_1_desc": "Built specifically for developers to highlight tech stacks and GitHub repositories.",
+        "feature_1_title": "Built for Software Engineers",
+        "feature_1_desc": "The best link-in-bio tool designed specifically to highlight your GitHub contribution graph and tech stack.",
         "feature_2_title": "Glassmorphism Design",
         "feature_2_desc": "Modern, aesthetic glass-like UI that stands out immediately.",
         "feature_3_title": "Tech Stack Badges",

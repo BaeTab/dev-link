@@ -14,12 +14,12 @@
         "footer": "Built with Dev-Link"
     },
     "landing": {
-        "hero_title": "개발자의 여정을 보여주세요",
-        "hero_desc": "프로젝트, 기술 스택, 소셜 링크를 보여주는 프리미엄 글래스모피즘 프로필을 만들어보세요.",
+        "hero_title": "개발자를 위한 프리미엄 링크트리 & 포트폴리오",
+        "hero_desc": "GitHub 레포지토리, 기술 스택, 이력서를 한눈에 보여주는 글래스모피즘 프로필을 3분 만에 완성하세요.",
         "get_started": "GitHub로 시작하기",
         "features_title": "왜 Dev-Link인가요?",
-        "feature_1_title": "개발자 중심",
-        "feature_1_desc": "기술 스택과 GitHub 저장소를 강조하기 위해 개발자를 위해 만들어졌습니다.",
+        "feature_1_title": "소프트웨어 엔지니어 전용",
+        "feature_1_desc": "GitHub 기여도와 기술 스택을 완벽하게 시각화하는 개발자 맞춤형 링크-인-바이오 도구입니다.",
         "feature_2_title": "글래스모피즘 디자인",
         "feature_2_desc": "즉시 눈에 띄는 현대적이고 미적인 유리 같은 UI를 제공합니다.",
         "feature_3_title": "기술 스택 배지",

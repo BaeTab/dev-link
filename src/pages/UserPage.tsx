@@ -141,6 +141,7 @@ export default function UserPage() {
 
 
     const isLightMode = profile?.theme === 'light';
+    const userKeywords = profile?.stacks?.join(', ');
 
     return (
         <div className={`min-h-screen ${isLightMode ? 'bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50' : 'bg-[#0a0a0f]'} selection:bg-purple-500/30 overflow-x-hidden`}>
@@ -170,6 +171,7 @@ export default function UserPage() {
                 description={profile?.bio || `Check out ${profile?.username}'s links on Dev-Link.`}
                 image={profile?.photoURL}
                 url={`/${profile?.username}`}
+                keywords={userKeywords}
             />
             <LanguageToggle />
 
